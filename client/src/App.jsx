@@ -27,7 +27,8 @@ function AuthPage() {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    password: ""
+    password: "",
+    role: "Member"
   });
   const [error, setError] = useState("");
 
@@ -68,6 +69,13 @@ function AuthPage() {
                 <label>
                   Name
                   <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                </label>
+                <label>
+                  Role
+                  <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+                    <option value="Admin">Admin - Can create projects & tasks</option>
+                    <option value="Member">Member - Can view & manage assignments</option>
+                  </select>
                 </label>
               </>
             )}

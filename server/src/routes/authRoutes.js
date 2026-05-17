@@ -21,7 +21,8 @@ router.post(
   [
     body("name").trim().isLength({ min: 2 }).withMessage("Name must be at least 2 characters"),
     body("email").isEmail().withMessage("Valid email is required").normalizeEmail(),
-    body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters")
+    body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+    body("role").optional().isIn(["Admin", "Member"]).withMessage("Role must be Admin or Member")
   ],
   validate,
   async (req, res, next) => {
@@ -32,11 +33,18 @@ router.post(
       }
 
       const isFirstUser = (await User.countDocuments()) === 0;
+      let role = req.body.role || "Member";
+      
+      // Only first user can be Admin if they request it, otherwise default to Member
+      if (!isFirstUser && role === "Admin") {
+        role = "Member";
+      }
+
       const user = await User.create({
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        role: isFirstUser ? "Admin" : "Member"
+        role: isFirstUser ? (role === "Admin" ? "Admin" : "Member") : "Member"
       });
 
       res.status(201).json(authResponse(user));
